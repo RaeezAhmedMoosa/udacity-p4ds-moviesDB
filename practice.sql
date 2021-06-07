@@ -1,5 +1,7 @@
 ### movies-db Practice SQL
 
+#### Practice Quiz 1
+
 /*
 Let's start with creating a table that provides the following details: actor's
 first and last name combined as full_name, film title, film description and
