@@ -236,3 +236,36 @@ SELECT t1.category_name AS category,
 FROM t1
 GROUP BY 1
 ORDER BY 2 DESC;
+-- This DQL is used to create the visualisation in excel for Question 1
+
+
+/*
+Question 1A
+
+What are the Top 10 movies for the category with the most total rentals within
+the family genre and how many times was each movie rented in total?
+*/
+
+-- Working final DQL
+SELECT sub1.title AS title,
+       sub1.category_name AS category_name,
+       COUNT(r.rental_id) AS rental_count
+FROM (
+  SELECT f.film_id AS film_id,
+         f.title AS title,
+         c.name AS category_name
+  FROM film f
+  LEFT JOIN film_category fc
+  ON f.film_id = fc.film_id
+  LEFT JOIN category c
+  ON c.category_id = fc.category_id
+  WHERE c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+) sub1
+LEFT JOIN inventory i
+ON sub1.film_id = i.film_id
+LEFT JOIN rental r
+ON r.inventory_id = i.inventory_id
+WHERE sub1.category_name = 'Animation'
+GROUP BY 1, 2
+ORDER BY 3 DESC
+LIMIT 10;
