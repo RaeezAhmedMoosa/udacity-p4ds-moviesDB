@@ -247,4 +247,45 @@ FROM
           WHEN length > 120 AND length <= 180 THEN 'Between 2-3 hours'
           ELSE 'More than 3 hours' END AS filmlen_groups
           FROM film ) t1
-ORDER BY  filmlen_groups
+ORDER BY  filmlen_groups;
+
+
+--
+SELECT sub1.title,
+       sub1.length,
+  CASE WHEN sub1.length <= 60 THEN '1 hour or less'
+       WHEN sub1.length > 60 AND sub1.length <= 120 THEN 'between 1 - 2 hours'
+       WHEN sub1.length > 120 AND sub1.length <= 180 THEN 'between 2 - 3 hours'
+       ELSE 'more than 3 hours' END AS filmlen_group
+FROM (
+  SELECT a.first_name || ' ' || a.last_name AS full_name,
+         f.title AS title,
+         f.length AS length
+  FROM actor a
+  LEFT JOIN film_actor fa
+  ON a.actor_id = fa.actor_id
+  LEFT JOIN film f
+  ON f.film_id = fa.film_id
+) sub1;
+
+
+WITH t1 AS
+(
+  SELECT f.title,
+         f.length,
+    CASE WHEN f.length <= 60 THEN '1 hour or less'
+         WHEN f.length > 60 AND f.length <= 120 THEN 'between 1 - 2 hours'
+         WHEN f.length > 120 AND f.length <= 180 THEN 'between 2 - 3 hours'
+         ELSE 'more than 3 hours' END AS filmlen_group
+  FROM film f
+)
+SELECT DISTINCT (t1.filmlen_group),
+       COUNT(t1.title) OVER
+       (PARTITION BY t1.filmlen_group)
+FROM t1
+ORDER BY 1;
+
+/*
+My error here was not using the data contained in the "film" table to avoid
+duplicated data that occurred earlier in the JOINed table
+*/
