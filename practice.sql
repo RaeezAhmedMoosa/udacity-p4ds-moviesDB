@@ -179,12 +179,12 @@ LEFT JOIN film f
 ON f.film_id = fa.film_id;
 
 
-SELECT sub1.full_name,
-       sub1.title,
+-- Final DQL
+SELECT DISTINCT sub1.title,
        sub1.length,
   CASE WHEN sub1.length <= 60 THEN '1 hour or less'
-       WHEN sub1.length > 60 AND sub1.length < 120 THEN 'between 1 - 2 hours'
-       WHEN sub1.length > 120 AND sub1.length < 180 THEN 'between 2 - 3 hours'
+       WHEN sub1.length > 60 AND sub1.length <= 120 THEN 'between 1 - 2 hours'
+       WHEN sub1.length > 120 AND sub1.length <= 180 THEN 'between 2 - 3 hours'
        ELSE 'more than 3 hours' END AS filmlen_group
 FROM (
   SELECT a.first_name || ' ' || a.last_name AS full_name,
@@ -195,4 +195,56 @@ FROM (
   ON a.actor_id = fa.actor_id
   LEFT JOIN film f
   ON f.film_id = fa.film_id
-) sub1;      
+) sub1;
+
+
+
+/*
+Question 2
+
+Now, we bring in the advanced SQL query concepts! Revise the query you wrote
+above to create a count of movies in each of the 4 filmlen_groups:
+
+• 1 hour or less
+• Between 1-2 hours
+• Between 2-3 hours
+• More than 3 hours
+*/
+
+-- Final DQL
+WITH t1 AS (
+  SELECT DISTINCT sub1.title,
+         sub1.length,
+    CASE WHEN sub1.length <= 60 THEN '1 hour or less'
+         WHEN sub1.length > 60 AND sub1.length < 120 THEN 'between 1 - 2 hours'
+         WHEN sub1.length > 120 AND sub1.length < 180 THEN 'between 2 - 3 hours'
+         ELSE 'more than 3 hours' END AS filmlen_group
+  FROM (
+    SELECT a.first_name || ' ' || a.last_name AS full_name,
+           f.title AS title,
+           f.length AS length
+    FROM actor a
+    LEFT JOIN film_actor fa
+    ON a.actor_id = fa.actor_id
+    LEFT JOIN film f
+    ON f.film_id = fa.film_id
+  ) sub1
+)
+SELECT t1.filmlen_group,
+       COUNT(t1.*) AS film_count
+FROM t1
+GROUP BY 1
+ORDER BY 2 DESC;
+
+
+-- Udacity SQL solution
+SELECT    DISTINCT(filmlen_groups),
+          COUNT(title) OVER (PARTITION BY filmlen_groups) AS filmcount_bylencat
+FROM
+         (SELECT title,length,
+          CASE WHEN length <= 60 THEN '1 hour or less'
+          WHEN length > 60 AND length <= 120 THEN 'Between 1-2 hours'
+          WHEN length > 120 AND length <= 180 THEN 'Between 2-3 hours'
+          ELSE 'More than 3 hours' END AS filmlen_groups
+          FROM film ) t1
+ORDER BY  filmlen_groups
