@@ -269,3 +269,28 @@ WHERE sub1.category_name = 'Animation'
 GROUP BY 1, 2
 ORDER BY 3 DESC
 LIMIT 10;
+-- This DQL is used for the visualisation in excel for Question 1A
+
+
+
+
+#### Question 2
+
+/*
+Now we need to know how the length of rental duration of these family-friendly
+movies compares to the duration that all movies are rented for.
+
+Can you provide a table with the movie titles and divide them into 4 levels
+(first_quarter, second_quarter, third_quarter, and final_quarter) based on the
+quartiles (25%, 50%, 75%) of the rental duration for movies across all
+categories?
+
+Make sure to also indicate the category that these family-friendly movies fall
+into.
+*/
+
+-- Exploratory DQL
+SELECT f.title AS title,
+       f.rental_duration AS duration
+FROM film f
+ORDER BY 2 DESC;       
