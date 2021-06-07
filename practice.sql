@@ -149,3 +149,50 @@ FROM t1
 GROUP BY 1, 2
 ORDER BY 3 DESC;
 -- Gina Degeneres with 42 films
+
+
+
+#### Practice Quiz 2
+
+/*
+Question 1
+
+Write a query that displays a table with 4 columns: actor's full name, film
+title, length of movie, and a column name "filmlen_groups" that classifies
+movies based on their length. Filmlen_groups should include 4 categories:
+
+• 1 hour or less
+• Between 1-2 hours
+• Between 2-3 hours
+• More than 3 hours
+
+*/
+
+-- JOINed table
+SELECT a.first_name || ' ' || a.last_name AS full_name,
+       f.title AS title,
+       f.length AS length
+FROM actor a
+LEFT JOIN film_actor fa
+ON a.actor_id = fa.actor_id
+LEFT JOIN film f
+ON f.film_id = fa.film_id;
+
+
+SELECT sub1.full_name,
+       sub1.title,
+       sub1.length,
+  CASE WHEN sub1.length <= 60 THEN '1 hour or less'
+       WHEN sub1.length > 60 AND sub1.length < 120 THEN 'between 1 - 2 hours'
+       WHEN sub1.length > 120 AND sub1.length < 180 THEN 'between 2 - 3 hours'
+       ELSE 'more than 3 hours' END AS filmlen_group
+FROM (
+  SELECT a.first_name || ' ' || a.last_name AS full_name,
+         f.title AS title,
+         f.length AS length
+  FROM actor a
+  LEFT JOIN film_actor fa
+  ON a.actor_id = fa.actor_id
+  LEFT JOIN film f
+  ON f.film_id = fa.film_id
+) sub1;      
