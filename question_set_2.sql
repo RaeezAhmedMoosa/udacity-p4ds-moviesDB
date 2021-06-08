@@ -177,3 +177,48 @@ ON f.film_id = fc.film_id
 ) sub1
 GROUP BY 1
 ORDER BY 2 DESC;
+
+
+
+#### Question 4A
+
+/*
+Which categories have an average rental rate greater than the overall average
+rental rate? Please round off your final values to 2 decimal places.
+*/
+
+-- Exploratory DQLs
+SELECT AVG(f.rental_rate) AS ovr_avg
+FROM film f;
+
+
+SELECT c.name AS category,
+       f.title AS title,
+       f.rental_rate AS rental_rate
+FROM category c
+LEFT JOIN film_category fc
+ON c.category_id = fc.category_id
+LEFT JOIN film f
+ON f.film_id = fc.film_id
+ORDER BY 1;
+
+
+-- Final Working DQL for Q4A
+SELECT sub1.category,
+       ROUND(AVG(sub1.rental_rate), 2) AS avg_rental
+FROM (
+  SELECT c.name AS category,
+         f.title AS title,
+         f.rental_rate AS rental_rate
+  FROM category c
+  LEFT JOIN film_category fc
+  ON c.category_id = fc.category_id
+  LEFT JOIN film f
+  ON f.film_id = fc.film_id
+) sub1
+GROUP BY 1
+HAVING AVG(sub1.rental_rate) > (
+  SELECT AVG(f.rental_rate) AS ovr_avg
+  FROM film f
+)
+ORDER BY 2 DESC;
