@@ -293,4 +293,88 @@ into.
 SELECT f.title AS title,
        f.rental_duration AS duration
 FROM film f
-ORDER BY 2 DESC;       
+ORDER BY 2 DESC;
+
+
+-- Exploratory DQL
+SELECT f.title AS title,
+       c.name AS category,
+       f.rental_duration AS duration
+FROM film f
+LEFT JOIN film_category fc
+ON f.film_id = fc.film_id
+LEFT JOIN category c
+ON c.category_id = fc.category_id
+ORDER BY 2;
+
+
+-- Exploratory DQL
+SELECT f.title AS title,
+       c.name AS category,
+       f.rental_duration AS duration,
+       NTILE(4) OVER
+       (ORDER BY f.rental_duration) AS quartile
+FROM film f
+LEFT JOIN film_category fc
+ON f.film_id = fc.film_id
+LEFT JOIN category c
+ON c.category_id = fc.category_id
+ORDER BY 2, 4;
+
+
+-- Exploratory DQL
+SELECT sub1.title AS title,
+       sub1.category AS category,
+       sub1.duration AS duration,
+       sub1.quartile AS quartile,
+  CASE WHEN sub1.quartile = 1 THEN '1st_quartile'
+       WHEN sub1.quartile = 2 THEN '2nd_quartile'
+       WHEN sub1.quartile = 3 THEN '3rd_quartile'
+       ELSE '4th_quartile' END AS quartile_type
+FROM (
+  SELECT f.title AS title,
+         c.name AS category,
+         f.rental_duration AS duration,
+         NTILE(4) OVER
+         (ORDER BY f.rental_duration) AS quartile
+  FROM film f
+  LEFT JOIN film_category fc
+  ON f.film_id = fc.film_id
+  LEFT JOIN category c
+  ON c.category_id = fc.category_id
+) sub1
+WHERE sub1.category IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+ORDER BY 4;
+
+
+-- Working final DQL for Question 2 in Question Set 1
+WITH t1 AS
+(
+  SELECT sub1.title AS title,
+         sub1.category AS category,
+         sub1.duration AS duration,
+         sub1.quartile AS quartile,
+    CASE WHEN sub1.quartile = 1 THEN '1st_quartile'
+         WHEN sub1.quartile = 2 THEN '2nd_quartile'
+         WHEN sub1.quartile = 3 THEN '3rd_quartile'
+         ELSE '4th_quartile' END AS quartile_type
+  FROM (
+    SELECT f.title AS title,
+           c.name AS category,
+           f.rental_duration AS duration,
+           NTILE(4) OVER
+           (ORDER BY f.rental_duration) AS quartile
+    FROM film f
+    LEFT JOIN film_category fc
+    ON f.film_id = fc.film_id
+    LEFT JOIN category c
+    ON c.category_id = fc.category_id
+  ) sub1
+  WHERE sub1.category IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+)
+SELECT t1.category,
+       t1.quartile_type,
+       COUNT(t1.quartile_type) AS quartile_count
+FROM t1
+GROUP BY 1, 2
+ORDER BY 1, 2;
