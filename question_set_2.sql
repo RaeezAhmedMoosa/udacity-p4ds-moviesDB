@@ -112,7 +112,7 @@ ORDER BY 1, 2;
 -- This DQL returns the total amount paid per customer for each month
 
 
--- Working final DQL for Q2 in QS2
+-- Working final DQL for Q2 in QS
 WITH t1 AS (
   SELECT DATE_TRUNC('month', p.payment_date) AS month,
          cu.first_name || ' ' || cu.last_name AS full_name,
@@ -141,3 +141,39 @@ LEFT JOIN t2
 ON t1.month = t2.month AND t1.full_name = t2.full_name
 ORDER BY 4 DESC
 LIMIT 10;
+
+
+
+#### Question 3A
+
+/*
+In terms of percentage, how many movies are found within each category?
+
+What is the overall Top 5 categories?
+*/
+
+-- Exploratory DQLs
+SELECT c.name AS category,
+	   f.title AS title
+FROM category c
+LEFT JOIN film_category fc
+ON c.category_id = fc.category_id
+LEFT JOIN film f
+ON f.film_id = fc.film_id
+ORDER BY 1;
+
+
+-- Working Final DQL
+SELECT sub1.category,
+       COUNT(sub1.title) AS movie_count
+FROM (
+  SELECT c.name AS category,
+	   f.title AS title
+FROM category c
+LEFT JOIN film_category fc
+ON c.category_id = fc.category_id
+LEFT JOIN film f
+ON f.film_id = fc.film_id
+) sub1
+GROUP BY 1
+ORDER BY 2 DESC;
