@@ -49,7 +49,7 @@ ORDER BY 1, 2, 3;
 
 SELECT s.store_id AS store_id,
        EXTRACT('year' FROM sub1.year) AS year,
-       sub1.month AS month,
+       EXTRACT('month' FROM sub1.month) AS month,
        sub1.rental_orders AS rental_orders,
        SUM(sub1.rental_orders) OVER
        (PARTITION BY s.store_id ORDER BY sub1.year, sub1.month) AS running_total
